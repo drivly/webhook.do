@@ -16,11 +16,11 @@ export default {
   fetch: async (req, env) => {
     const { user, body, url, headers, cf } = await env.CTX.fetch(req).then(res => res.json())
     const { origin, hostname, pathname } = new URL(req.url)
-    const [ _, namespace, id ] = pathname.split('/')
+    const [ _, namespace, id = headers['cf-ray'] ] = pathname.split('/')
     const ua = headers['user-agent']
     const { ip, isp, city, region, country, continent } = user
     const location = `${city}, ${region}, ${country}, ${continent}`
-    const data = body ? await env.WEBHOOKS.put(`${namespace}/${headers['ray-id']}`, JSON.stringify({ namespace, id, url, body, headers, cf, user }, null, 2) , { 
+    const data = body ? await env.WEBHOOKS.put(`${namespace}/${id}`, JSON.stringify({ namespace, id, url, body, headers, cf, user }, null, 2) , { 
       metadata: { ip, ua, location, url: `https://webhooks.do/${namespace}/${id}` },
       expirationTtl: 30 * 24 * 60 * 60 ,
     }) : id ? await env.WEBHOOKS.get(`${namespace}/${id}`, { type: "text" }) : await env.WEBHOOKS.list({ prefix: `${namespace}/`}).then(list => list.keys.map(item => item.metadata))
