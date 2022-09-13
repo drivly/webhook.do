@@ -18,7 +18,7 @@ export default {
     const { origin, hostname, pathname } = new URL(req.url)
     let [ _, namespace, id = headers['cf-ray'] ] = pathname.split('/')
     if (namespace == ':namespace') {
-      namespace = Crypto.randomUUID() 
+      namespace = crypto.randomUUID() 
     }
     const ua = headers['user-agent']
     const { ip, isp, city, region, country, continent } = user
