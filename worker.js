@@ -14,10 +14,16 @@ const api = {
 
 export default {
   fetch: async (req, env) => {
-    const { user, body } = await env.CTX.fetch(req).then(res => res.json())
+    const { user, body, url, headers, cf } = await env.CTX.fetch(req).then(res => res.json())
     const { origin, hostname, pathname } = new URL(req.url)
-    const [ _, namespace, id = req.headers.get('cf-ray') ] = pathname.split('/')
-//     const body = await req.json().catch(ex => undefined)
-    return new Response(JSON.stringify({ api, namespace, id, body, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    const [ _, namespace, id ] = pathname.split('/')
+    const ua = headers['user-agent']
+    const { ip, isp, city, region, country, continent } = user
+    const location = `${city}, {region}, {country}, {continent}`
+    const data = body ? await env.WEBHOOKS.put(`${namespace}/${id}`, JSON.stringify({ namespace, id, url, body, headers, cf, user }, null, 2) , { 
+      metadata: { ip, ua, location, url: `https://webhooks.do/${namespace}/${id}` },
+      expirationTtl: 30 * 24 * 60 * 60 ,
+    }) : id ? await env.WEBHOOKS.get(`${namespace}/${id}`) : await env.WEBHOOKS.list({ prefix: `${namespace}/`})
+    return new Response(JSON.stringify({ api, namespace, id, data, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   }
 }
