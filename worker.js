@@ -19,7 +19,7 @@ export default {
     const [ _, namespace, id ] = pathname.split('/')
     const ua = headers['user-agent']
     const { ip, isp, city, region, country, continent } = user
-    const location = `${city}, {region}, {country}, {continent}`
+    const location = `${city}, ${region}, ${country}, ${continent}`
     const data = body ? await env.WEBHOOKS.put(`${namespace}/${id}`, JSON.stringify({ namespace, id, url, body, headers, cf, user }, null, 2) , { 
       metadata: { ip, ua, location, url: `https://webhooks.do/${namespace}/${id}` },
       expirationTtl: 30 * 24 * 60 * 60 ,
