@@ -20,10 +20,11 @@ export default {
     const ua = headers['user-agent']
     const { ip, isp, city, region, country, continent } = user
     const location = `${city}, ${region}, ${country}, ${continent}`
+    const list = `https://webhooks.do/${namespace}`
     const data = body ? await env.WEBHOOKS.put(`${namespace}/${id}`, JSON.stringify({ namespace, id, url, body, headers, cf, user }, null, 2) , { 
       metadata: { ip, ua, location, url: `https://webhooks.do/${namespace}/${id}` },
       expirationTtl: 30 * 24 * 60 * 60 ,
     }) : id != headers['cf-ray'] ? await env.WEBHOOKS.get(`${namespace}/${id}`, { type: "json" }) : await env.WEBHOOKS.list({ prefix: `${namespace}/`}).then(list => list.keys.map(item => item.metadata))
-    return new Response(JSON.stringify({ api, namespace, id, data, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, namespace, id, list, data, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   }
 }
