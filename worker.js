@@ -14,10 +14,10 @@ const api = {
 
 export default {
   fetch: async (req, env) => {
-    const { user } = await env.CTX.fetch(req)
+    const { user } = await env.CTX.fetch(req).then(res => res.json())
     const { origin, hostname, pathname } = new URL(req.url)
     const [ _, namespace, id ] = pathname.split('/')
-    const body = req.body ? await req.json() : undefined
-    return new Response(JSON.stringify({ api, user }, null, 2), {})
+    const body = await req.json().catch(ex => undefined)
+    return new Response(JSON.stringify({ api, body, user }, null, 2), {})
   }
 }
