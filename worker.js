@@ -14,7 +14,7 @@ const api = {
 
 export default {
   fetch: async (req, env) => {
-    const { user, body, url, time, headers, cf } = await env.CTX.fetch(req).then(res => res.json())
+    const { user, body, url, ts, time, headers, cf } = await env.CTX.fetch(req).then(res => res.json())
     const { origin, hostname, pathname } = new URL(req.url)
     let [ _, namespace, id = headers['cf-ray'] ] = pathname.split('/')
     if (namespace == ':namespace') {
@@ -28,6 +28,6 @@ export default {
       metadata: { time, ip, ua, location, url: `https://webhooks.do/${namespace}/${id}` },
       expirationTtl: 30 * 24 * 60 * 60 ,
     }) : id != headers['cf-ray'] ? await env.WEBHOOKS.get(`${namespace}/${id}`, { type: "json" }) : await env.WEBHOOKS.list({ prefix: `${namespace}/`}).then(list => list.keys.map(item => item.metadata))
-    return new Response(JSON.stringify({ api, namespace, id, list, data, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, namespace, ts, time, id, list, data, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   }
 }
