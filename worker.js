@@ -18,6 +18,6 @@ export default {
     const { origin, hostname, pathname } = new URL(req.url)
     const [ _, namespace, id ] = pathname.split('/')
     const body = await req.json().catch(ex => undefined)
-    return new Response(JSON.stringify({ api, body, user }, null, 2), {})
+    return new Response(JSON.stringify({ api, body, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   }
 }
