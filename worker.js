@@ -9,6 +9,8 @@ const api = {
     details: 'https://webhooks.do/:namespace/:id',
   },
   site: 'https://webhooks.do',
+  login: 'https://webhooks.do/login',
+  signup: 'https://webhooks.do/signup',
   repo: 'https://github.com/drivly/webhooks.do',
 }
 
@@ -17,7 +19,7 @@ export default {
     const { user, body, url, ts, time, headers, cf } = await env.CTX.fetch(req).then(res => res.json())
     const { origin, hostname, pathname } = new URL(req.url)
     let [ _, namespace, id = headers['cf-ray'] ] = pathname.split('/')
-    if (namespace == ':namespace') {
+    if (namespace.length != 36 || namespace == ':namespace') {
       namespace = crypto.randomUUID() 
     }
     const ua = headers['user-agent']
